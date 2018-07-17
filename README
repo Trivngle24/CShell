@@ -1,52 +1,25 @@
 C Shell
 
-• A C program that provides the basic operation of a command line shell is given
-below. The main() function first calls read_command(), which reads a full
-command from the user and tokenizes it into separate words (arguments). These
-tokens can be passed directly to execvp() in the child process.
+• A C program that provides the basic operation of a command line shell is given below. The main() function first calls read_command(), which reads a full command from the user and tokenizes it into separate words (arguments). These tokens can be passed directly to execvp() in the child process.
 
-• If the user enters an “&” as the final argument, read_command() will set the
-in_background parameter to true (and remove the “&” from the array of tokens).
-For example, if the user enters “ls –l” at the '>' prompt, tokens[0] will contain
-“ls”, tokens[1] will contain (or point to) the string “-l”, and tokens[2] will be a
-NULL pointer indicating the end of the arguments. (Each of these strings is a
-NULL terminated C-style string). Note that the character array buff will contain
-the text that the user entered; however, it will not be one single NULL terminated
-string but rather a bunch of NULL terminated strings, each of which is a token
-pointed to by the tokens array.
+• If the user enters an “&” as the final argument, read_command() will set the in_background parameter to true and remove the “&” from the array of tokens.
+For example, if the user enters “ls –l” at the '>' prompt, tokens[0] will contain “ls”, tokens[1] will contain or point to the string “-l”, and tokens[2] will be a NULL pointer indicating the end of the arguments. Each of these strings is a NULL terminated C-style string. Note that the character array buff will contain the text that the user entered. It will not be one single NULL terminated string but a bunch of NULL terminated strings. Each of which is a token pointed to by the tokens array.
 
 
 Creating Child Process
 
-• First, modify main() so that upon returning form read_command(), a child is
-forked and executes the command specified by the user. As noted above,
-read_command() loads the contents of the tokens array with the command
-specified by the user. This tokens array will be passed to the execvp() function,
-which has the following interface:
+• First, modify main() so that upon returning form read_command(), a child is forked and executes the command specified by the user. As noted above, read_command() loads the contents of the tokens array with the command specified by the user. This tokens array will be passed to the execvp() function, which has the following interface:
 	execvp(char *command, char * params[]);
-where command represents the command to be performed and params stores the
-parameters to this command. For this project, the execvp() function should be
-invoked as execvp(tokens[0], tokens);
+where "command" represents the command to be performed, and "params" stores the parameters to this command. For this project, the execvp() function should be invoked as 
+	execvp(tokens[0], tokens);
 
-• Be sure to check the value of in_background to determine if the parent process is
-to wait for the child exit or not. Hint: use waitpid() vs wait() because you want to
-wait on the child you just launched. If you only use wait() and have previously
-launched any child processes in the background that have terminated, wait() will
-immediately return having “consumed” the previous zombie process, and your
-current process incorrectly acts as though it was run in the background. Note that
-we won't be testing with interactive command-line processes run in the
-background (think vim), or test using signals while running a command in the
-background.
+• Be sure to check the value of in_background to determine if the parent process is to wait for the child to exit or not. Hint: use waitpid() vs wait() because you want to wait on the child you just launched. If you only use wait() and have previously launched any child processes in the background that have terminated, wait() will
+immediately return having “consumed” the previous zombie process, and your current process incorrectly acts as though it was run in the background. Note that we won't be testing with interactive command-line processes run in the background (think vim), or test using signals while running a command in the background.
 
-• If execvp() returns an error (see man execvp) then display an error message.
+• If execvp() returns an error (see man execvp), display an error message.
 
-• Note that using printf() may not work well for this assignment and that you
-should use write() instead (look up more with man write). The issue is that we
-need to use the read() function for getting the user's command and use write()
-when working with signals (later). And, it turns out that printf() and read()/
-write() don't always work well together.
+• Note that using printf() may not work well for this assignment and that you should use write() instead (look up more with man write). The issue is that we need to use the read() function for getting the user's command. Use write() when working with signals later. It also turns out that printf() and read()/write() don't always work well together.
 
-• Therefore, when printing to the screen, use the write() command. For common
-things, such as displaying a simple string, or writing a number to the screen, you
-may want to make your own functions which make it easier. (You can convert an
-integer to a string using sprintf()).
+•For common things, such as displaying a simple string, or writing a number to the screen, you may want to create your own functions to make message displaying easier. 
+
+•You can convert an integer to a string using sprintf().
